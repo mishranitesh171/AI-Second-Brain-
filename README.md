@@ -124,6 +124,22 @@ Visit `http://localhost:5173` 🚀
 | Backend | Render | Free web service |
 | Database | MongoDB Atlas | 512MB free |
 
+## 🤖 AI & MCP Integration
+
+This project supports the **Model Context Protocol (MCP)** via GitMCP. You can connect your AI assistant (like Claude or Gemini) directly to this codebase using the following configuration:
+
+```json
+{
+  "mcpServers": {
+    "AI-Second-Brain- Docs": {
+      "url": "https://gitmcp.io/mishranitesh171/AI-Second-Brain-"
+    }
+  }
+}
+```
+
+This allows AI agents to read, search, and understand the entire architecture of this "Second Brain" project in real-time.
+
 ## 📄 License
 
 MIT © Nitesh Kumar
