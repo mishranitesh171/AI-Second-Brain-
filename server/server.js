@@ -34,6 +34,9 @@ const httpServer = createServer(app);
 // Initialize Socket.IO
 const io = initSocket(httpServer);
 
+// Trust proxy headers for Render & Rate Limiting
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
@@ -96,14 +99,17 @@ app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
+// Note: Render needs the host to be 0.0.0.0
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
 const startServer = async () => {
   await connectDB();
 
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, HOST, () => {
     console.log(`
     🧠 ═══════════════════════════════════════════
        AI Second Brain Server
+       Host: ${HOST}
        Port: ${PORT}
        Mode: ${process.env.NODE_ENV || 'development'}
        Socket.IO: Active
