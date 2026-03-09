@@ -1,6 +1,7 @@
-import { summarizeText, expandText, rewriteText, suggestTags, generateWritingSuggestion } from '../services/aiService.js';
+import { summarizeText, expandText, rewriteText, suggestTags, generateWritingSuggestion, analyzeImage } from '../services/aiService.js';
 import { ragQuery, semanticSearch } from '../services/ragService.js';
 import { clipWebPage } from '../services/webClipperService.js';
+import fs from 'fs/promises';
 import Note from '../models/Note.js';
 
 // @desc    Summarize text
@@ -142,4 +143,30 @@ export const autoLink = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// @desc    Analyze image (Vision)
+// @route   POST /api/ai/analyze-image
+export const imageAnalysis = async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'Image file is required' });
+
+    const analysis = await analyzeImage(req.file.buffer, req.file.mimetype, req.body.prompt);
+    res.json({ success: true, data: { analysis } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default {
+  summarize,
+  expand,
+  rewrite,
+  ask,
+  autoTag,
+  smartSearch,
+  webClip,
+  writingSuggestion,
+  autoLink,
+  imageAnalysis,
 };

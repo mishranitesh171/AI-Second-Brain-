@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { HiOutlineSparkles, HiOutlineMagnifyingGlass, HiOutlineChatBubbleLeftRight, HiOutlineGlobeAlt, HiOutlineTag } from 'react-icons/hi2';
+import { HiOutlineSparkles, HiOutlineMagnifyingGlass, HiOutlineChatBubbleLeftRight, HiOutlineGlobeAlt, HiOutlineTag, HiOutlinePhoto } from 'react-icons/hi2';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import './AI.css';
@@ -11,10 +11,23 @@ const AI = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFilePreview(URL.createObjectURL(file));
+      // Switch to vision tab if not already there
+      setActiveTab('vision');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedFile) return;
     setLoading(true);
     setResult(null);
 
@@ -43,18 +56,29 @@ const AI = () => {
           setResult({ type: 'tags', data: res.data.data.tags });
           break;
         }
+        case 'vision': {
+          const formData = new FormData();
+          formData.append('image', selectedFile);
+          formData.append('prompt', input || 'Analyze this image in detail');
+          const res = await api.post('/ai/analyze-image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          setResult({ type: 'vision', data: res.data.data.analysis });
+          break;
+        }
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'AI request failed');
     }
     setLoading(false);
-    if (activeTab !== 'ask') setInput('');
+    if (activeTab !== 'ask' && activeTab !== 'vision') setInput('');
   };
 
   const tabs = [
     { id: 'ask', label: 'Ask AI', icon: <HiOutlineChatBubbleLeftRight />, placeholder: 'Ask a question about your notes...' },
     { id: 'search', label: 'Smart Search', icon: <HiOutlineMagnifyingGlass />, placeholder: 'Semantic search across all notes...' },
     { id: 'clip', label: 'Web Clipper', icon: <HiOutlineGlobeAlt />, placeholder: 'Paste a URL to clip...' },
+    { id: 'vision', label: 'Image Insights', icon: <HiOutlinePhoto />, placeholder: 'Describe what you want to know about this image...' },
     { id: 'tags', label: 'Auto-Tag', icon: <HiOutlineTag />, placeholder: 'Paste text to get tag suggestions...' },
   ];
 
@@ -120,6 +144,30 @@ const AI = () => {
           </div>
         )}
 
+        {activeTab === 'vision' && (
+          <div className="ai-page__vision">
+            {filePreview && (
+              <div className="ai-page__vision-preview glass-card">
+                <img src={filePreview} alt="Preview" />
+                <button className="ai-page__vision-remove" onClick={() => { setSelectedFile(null); setFilePreview(null); }}>✕</button>
+              </div>
+            )}
+            {!filePreview && (
+              <div className="ai-page__empty">
+                <HiOutlinePhoto />
+                <p>Upload an image to analyze, extract text, or ask questions about it.</p>
+                <button className="btn-secondary" onClick={() => fileInputRef.current.click()}>Upload Image</button>
+              </div>
+            )}
+            {result?.type === 'vision' && (
+              <div className="ai-page__vision-result">
+                <h4><HiOutlineSparkles /> AI Analysis</h4>
+                <div className="ai-page__vision-text">{result.data}</div>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'clip' && result?.type === 'clip' && (
           <div className="ai-page__clip-result">
             <h4>✅ Clipped: {result.data.clipped.title}</h4>
@@ -144,8 +192,12 @@ const AI = () => {
 
       {/* Input */}
       <form className="ai-page__input-area" onSubmit={handleSubmit}>
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
+        <button type="button" className={`btn-icon ${selectedFile ? 'has-file' : ''}`} onClick={() => fileInputRef.current.click()}>
+          <HiOutlinePhoto />
+        </button>
         <input type="text" className="input" placeholder={activeTabData.placeholder} value={input} onChange={e => setInput(e.target.value)} disabled={loading} />
-        <button type="submit" className="btn-primary" disabled={loading || !input.trim()}>
+        <button type="submit" className="btn-primary" disabled={loading || (!input.trim() && !selectedFile)}>
           {loading ? <span className="spinner" /> : 'Send'}
         </button>
       </form>

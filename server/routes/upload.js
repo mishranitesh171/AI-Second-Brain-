@@ -10,8 +10,8 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    // For now, return local file path. In production, use Cloudinary.
-    const fileUrl = `/uploads/${req.file.filename}`;
+    // `req.file.path` contains the Cloudinary URL when using CloudinaryStorage
+    const fileUrl = req.file.path;
 
     res.json({
       success: true,

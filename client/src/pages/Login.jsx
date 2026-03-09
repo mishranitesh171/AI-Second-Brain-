@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { TbBrain } from 'react-icons/tb';
 import { HiOutlineEye, HiOutlineEyeSlash } from 'react-icons/hi2';
+import { FcGoogle } from 'react-icons/fc';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -60,6 +61,15 @@ const Login = () => {
             {isLoading ? <span className="spinner" /> : 'Sign In'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>or</span>
+        </div>
+
+        <a href={`${import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000'}/api/auth/google`} className="auth-google-btn">
+          <FcGoogle size={20} />
+          Continue with Google
+        </a>
 
         <p className="auth-card__footer">
           Don't have an account? <Link to="/register">Sign Up</Link>

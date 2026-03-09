@@ -9,6 +9,7 @@ import Layout from './components/layout/Layout';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import Notes from './pages/Notes';
 import NoteEditor from './pages/NoteEditor';
@@ -42,6 +43,7 @@ function AppRoutes() {
       {/* Public routes */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>

@@ -232,3 +232,24 @@
     display: none;
   }
 }
+
+/* Tablet Auto-Collapse */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-collapsed);
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .sidebar__logo-text,
+  .sidebar__new-btn span,
+  .sidebar__nav-label,
+  .sidebar__action span,
+  .sidebar__user-info,
+  .sidebar__user .btn-icon {
+    display: none;
+  }
+
+  .sidebar__new-btn {
+    padding: var(--space-3);
+  }
+}

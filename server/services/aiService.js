@@ -91,6 +91,23 @@ export const generateWritingSuggestion = async (text) => {
   return result.response.text();
 };
 
+export const analyzeImage = async (imageBuffer, mimeType, prompt = 'Analyze this image in detail and extract any text if present.') => {
+  const ai = getGenAI();
+  if (!ai) throw new Error('Gemini API key not configured');
+
+  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+  const imageData = {
+    inlineData: {
+      data: imageBuffer.toString('base64'),
+      mimeType
+    }
+  };
+
+  const result = await model.generateContent([prompt, imageData]);
+  return result.response.text();
+};
+
 export default {
   summarizeText,
   expandText,
@@ -98,4 +115,5 @@ export default {
   askQuestion,
   suggestTags,
   generateWritingSuggestion,
+  analyzeImage,
 };
