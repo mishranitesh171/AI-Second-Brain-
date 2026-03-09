@@ -66,7 +66,7 @@ const Login = () => {
           <span>or</span>
         </div>
 
-        <a href={`${import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000'}/api/auth/google`} className="auth-google-btn">
+        <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`} className="auth-google-btn">
           <FcGoogle size={20} />
           Continue with Google
         </a>
