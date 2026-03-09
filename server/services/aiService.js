@@ -91,15 +91,22 @@ export const generateWritingSuggestion = async (text) => {
   return result.response.text();
 };
 
-export const analyzeImage = async (imageBuffer, mimeType, prompt = 'Analyze this image in detail and extract any text if present.') => {
+export const analyzeImage = async (imageUrl, mimeType, prompt = 'Analyze this image in detail and extract any text if present.') => {
   const ai = getGenAI();
   if (!ai) throw new Error('Gemini API key not configured');
 
   const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
+  // Fetch the image from Cloudinary URL and convert to base64
+  const response = await fetch(imageUrl);
+  if (!response.ok) throw new Error('Failed to fetch image from Cloudinary');
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
   const imageData = {
     inlineData: {
-      data: imageBuffer.toString('base64'),
+      data: buffer.toString('base64'),
       mimeType
     }
   };

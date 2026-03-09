@@ -151,7 +151,8 @@ export const imageAnalysis = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'Image file is required' });
 
-    const analysis = await analyzeImage(req.file.buffer, req.file.mimetype, req.body.prompt);
+    // With Cloudinary, the file URL is in req.file.path. There is no req.file.buffer.
+    const analysis = await analyzeImage(req.file.path, req.file.mimetype, req.body.prompt);
     res.json({ success: true, data: { analysis } });
   } catch (error) {
     next(error);
